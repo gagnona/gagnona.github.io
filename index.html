@@ -53,16 +53,16 @@
         html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
 
         // 4. The same logic from before to check the API
-        async function checkProduct() {
+        async function checkProduct(decodedText) {
             const barcode = document.getElementById('barcode').value;
-            resultArea.innerHTML = "Checking database..."+barcode;
+            resultArea.innerHTML = "Checking database..."+decodedText;
 
             try {
-                const response = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${barcode}.json`);
+                const response = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${decodedText}.json`);
                 const data = await response.json();
 
                 if (data.status === 0) {
-                    resultArea.innerHTML = `<h3>❌ Not Found</h3><p>Barcode: ${barcode}</p><button onclick="location.reload()">Scan Again</button>`;
+                    resultArea.innerHTML = `<h3>❌ Not Found</h3><p>Barcode: ${decodedText}</p><button onclick="location.reload()">Scan Again</button>`;
                     return;
                 }
 
