@@ -105,9 +105,76 @@
         "fragrance": ["parfum", "aroma", "essential oil blend"],
         "coconut oil": ["cocos nucifera oil"],
         "water": ["aqua", "eau"]
-    };
+    };const allergyDict = {
+    "sulfates": ["sodium lauryl sulfate", "sodium laureth sulfate", "ammonium lauryl sulfate", "sodium coco-sulfate"],
+    "parabens": ["methylparaben", "ethylparaben", "propylparaben", "butylparaben", "isobutylparaben"],
+    "fragrance": ["parfum", "aroma", "fragrance", "linalool", "limonene", "geraniol", "citronellol", "eugenol"],
+    "phenoxyethanol": ["phenoxyethanol", "2-phenoxyethanol"],
+    "formaldehyde releasers": ["dmdm hydantoin", "imidazolidinyl urea", "diazolidinyl urea", "quaternium-15"],
+    "silicones": ["dimethicone", "cyclomethicone", "amodimethicone", "cyclopentasiloxane", "dimethiconol"],
+    "isothiazolinones": ["methylisothiazolinone", "methylchloroisothiazolinone"], // Common in shampoos
+    "alcohols (drying)": ["alcohol denat", "isopropyl alcohol", "sd alcohol", "ethanol"],
+    "alcohols (fatty/safe)": ["cetyl alcohol", "stearyl alcohol", "cetearyl alcohol"],
+    "phthalates": ["diethyl phthalate", "dep"],
+    "mineral oil": ["paraffinum liquidum", "petrolatum", "cera microcristallina"],
+    "lanolin": ["lanolin", "adeps lanae", "lanolin alcohol"],
+    "nut oils": ["prunus amygdalus dulcis oil", "arachis hypogaea oil", "butyrospermum parkii butter"], // Almond, Peanut, Shea
+    "coconut derivatives": ["cocos nucifera oil", "cocamidopropyl betaine", "coconut acid"],
+    "vitamin c": ["ascorbic acid", "sodium ascorbyl phosphate", "ascorbyl palmitate"],
+    "vitamin e": ["tocopherol", "tocopheryl acetate", "tocopheryl nicotinate"]
+};
 
     let myAllergies = JSON.parse(localStorage.getItem('canadianAllergies')) || ["Sulfate"];
+    
+// 1. Populate the dropdown when the app starts
+function populateDropdown() {
+    const select = document.getElementById('common-allergy-select');
+    // Sort keys alphabetically
+    const commonNames = Object.keys(allergyDict).sort();
+    
+    commonNames.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        select.appendChild(option);
+    });
+}
+/*    
+function populateDropdown() {
+    const select = document.getElementById('common-allergy-select');
+    // Get all keys from your dictionary (sulfate, vitamin e, etc.)
+    const commonNames = Object.keys(allergyDict);
+    
+    commonNames.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        // Capitalize the first letter for the display
+        option.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        select.appendChild(option);
+    });
+}
+*/
+// 2. Function to add the selected item from the dropdown
+function addFromDropdown() {
+    const select = document.getElementById('common-allergy-select');
+    const selectedValue = select.value;
+    
+    if (selectedValue && !myAllergies.includes(selectedValue)) {
+        myAllergies.push(selectedValue);
+        saveAndRefresh();
+        select.value = ""; // Reset dropdown
+    }
+}
+
+// 3. Helper to save and update UI (reusing your existing logic)
+function saveAndRefresh() {
+    localStorage.setItem('canadianAllergies', JSON.stringify(myAllergies));
+    displayAllergies();
+}
+
+// 4. Call populateDropdown() at the very bottom of your script
+populateDropdown();
+displayAllergies();
 
     // --- UI LOGIC ---
     function switchTab(view) {
@@ -159,6 +226,7 @@
                 if(syn) triggers.push(`${allergy} (${syn})`);
             }
         });
+        
 
         const isSafe = triggers.length === 0;
         resultArea.innerHTML = `
