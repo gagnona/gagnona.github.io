@@ -153,6 +153,7 @@
         const cleanText = rawText.toLowerCase()
             .replace(/[^\p{L}\p{N}\s]/gu, ' ')
             .replace(/\s+/g, ' ')
+            .replace(/%\w\w/g, ' ')
             .trim();
 
         let found = [];
