@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SafeScan Canada</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     
@@ -14,40 +19,49 @@
             --success: #16a34a;
             --bg: #f8fafc;
             --card: #ffffff;
+            --text: #1e293b;
         }
 
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #1e293b; }
-        .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); color: var(--text); margin: 0; padding: 0; 
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 15px; padding-bottom: 100px; }
         
         header { text-align: center; padding: 20px 0; }
-        h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
+        header h1 { margin: 0; font-size: 1.6rem; color: var(--primary); letter-spacing: -0.5px; }
 
-        /* Tabs */
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: #e2e8f0; padding: 5px; border-radius: 10px; }
-        .tab { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; background: transparent; font-weight: 600; font-size: 0.8rem; }
-        .tab.active { background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); color: var(--primary); }
-
-        /* Cards */
-        .card { background: var(--card); padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; }
         
-        /* Allergy Tags */
-        .allergy-input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; }
-        .btn-add { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; }
-        .tag { display: inline-flex; align-items: center; background: #f1f5f9; padding: 5px 12px; border-radius: 20px; margin: 4px; font-size: 0.85rem; border: 1px solid #e2e8f0; }
-        .tag-remove { margin-left: 8px; color: var(--danger); cursor: pointer; font-weight: bold; }
+        /* Tabs Navigation */
+        .tabs { display: flex; gap: 4px; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 10px 5px; border: none; border-radius: 10px; cursor: pointer; background: transparent; font-weight: 600; font-size: 0.75rem; transition: 0.2s; }
+        .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-        /* Scanner/OCR Areas */
-        #reader { width: 100%; border-radius: 10px; overflow: hidden; background: #000; }
+        /* Allergy Management */
+        .input-group { display: flex; gap: 8px; margin-bottom: 10px; }
+        select, input, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; }
+        .btn { padding: 12px 18px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: #64748b; color: white; }
+        
+        .tag-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .tag { background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; border: 1px solid #e2e8f0; }
+        .tag-remove { margin-left: 8px; color: var(--danger); font-weight: bold; cursor: pointer; }
+
+        /* Result Styles */
+        #result-area { display: none; }
+        .status-banner { padding: 15px; border-radius: 12px; font-weight: 800; text-align: center; margin-bottom: 15px; font-size: 1.1rem; }
+        .danger-banner { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
+        .success-banner { background: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
+        
+        /* Scanner Container */
+        #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; }
         .hidden { display: none; }
         
-        /* Results */
-        .status-box { padding: 15px; border-radius: 10px; font-weight: bold; text-align: center; margin-bottom: 15px; }
-        .status-warning { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
-        .status-safe { background: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
-        .status-loading { background: #f1f5f9; color: #64748b; }
-
-        .ingredients-detail { font-size: 0.8rem; color: #64748b; line-height: 1.4; border-top: 1px solid #e2e8f0; pt: 10px; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -58,226 +72,218 @@
     </header>
 
     <div class="card">
-    <strong>My Allergies</strong>
-    <p style="font-size: 0.75rem; color: #64748b; margin-top: 0;">Add custom or pick from common triggers:</p>
-    
-    <div class="allergy-input-group">
-        <select id="common-allergy-select" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
-            <option value="">-- Quick Add Common --</option>
-            </select>
-        <button class="btn-add" onclick="addFromDropdown()" style="background: #64748b;">Add</button>
+        <label style="font-weight: bold; font-size: 0.9rem;">Quick Add Allergy</label>
+        <div class="input-group" style="margin-top:5px;">
+            <select id="allergy-dropdown"></select>
+            <button class="btn btn-primary" onclick="addFromDropdown()">Add</button>
+        </div>
+        
+        <div class="input-group">
+            <input type="text" id="custom-allergy" placeholder="Or type custom...">
+            <button class="btn btn-secondary" onclick="addCustom()">+</button>
+        </div>
+
+        <div id="tag-list" class="tag-container"></div>
     </div>
 
-    <div class="allergy-input-group" style="margin-top:10px;">
-        <input type="text" id="allergy-input" placeholder="Or type custom (e.g. Peanut)">
-        <button class="btn-add" onclick="addAllergy()">Add</button>
-    </div>
-    
-    <div id="allergy-list"></div>
-    </div>
- 
     <div class="tabs">
-        <button class="tab active" onclick="switchTab('barcode')">Barcode</button>
-        <button class="tab" onclick="switchTab('photo')">Photo OCR</button>
-        <button class="tab" onclick="switchTab('link')">Paste URL</button>
+        <button class="tab active" onclick="switchTab(event, 'barcode')">Barcode</button>
+        <button class="tab" onclick="switchTab(event, 'photo')">Photo OCR</button>
+        <button class="tab" onclick="switchTab(event, 'link')">URL</button>
+        <button class="tab" onclick="switchTab(event, 'manual')">Paste Text</button>
     </div>
 
     <div id="barcode-view" class="tool-view">
         <div id="reader"></div>
-        <p style="text-align:center; font-size: 0.8rem;">Point camera at product barcode</p>
+        <p style="text-align:center; color:#64748b; font-size:0.8rem;">Center barcode in square</p>
     </div>
 
     <div id="photo-view" class="tool-view hidden">
         <div class="card" style="text-align:center;">
-            <input type="file" id="ocr-upload" accept="image/*" capture="environment" style="display:none" onchange="processOCR(event)">
-            <button class="btn-add" style="width:100%;" onclick="document.getElementById('ocr-upload').click()">📸 Take Photo of Ingredients</button>
-            <p id="ocr-status" style="font-size:0.8rem; margin-top:10px;"></p>    </div>
-
-    <div id="link-view" class="tool-view hidden">
-        <div class="card">
-            <input type="text" id="url-input" placeholder="Paste Incidecoder URL..." style="width:100%; box-sizing:border-box; margin-bottom:10px;">
-            <button class="btn-add" style="width:100%;" onclick="checkByUrl()">Analyze URL</button>
+            <input type="file" id="ocr-file" accept="image/*" capture="environment" style="display:none" onchange="handleOCR(event)">
+            <button class="btn btn-primary" style="width:100%" onclick="document.getElementById('ocr-file').click()">📸 Take Label Photo</button>
+            <div id="ocr-loader" class="hidden" style="margin-top:15px;">
+                <div class="loader"></div> <span style="font-size:0.9rem;">Reading ingredients...</span>
+            </div>
         </div>
     </div>
 
-    <div id="result-area" class="card hidden">
+    <div id="link-view" class="tool-view hidden">
+        <div class="card">
+            <input type="text" id="url-input" placeholder="Paste Incidecoder URL...">
+            <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="scrapeUrl()">Analyze Website</button>
         </div>
+    </div>
+
+    <div id="manual-view" class="tool-view hidden">
+        <div class="card">
+            <textarea id="manual-input" rows="6" placeholder="Paste ingredients list here..."></textarea>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn btn-primary" style="flex:2" onclick="analyzeManual()">Analyze</button>
+                <button class="btn btn-secondary" style="flex:1" onclick="clearManual()">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-area" class="card"></div>
 </div>
 
 <script>
-    // --- DICTIONARY & STATE ---
-const allergyDict = {
-    "sulfates": ["sodium lauryl sulfate", "sodium laureth sulfate", "ammonium lauryl sulfate", "sodium coco-sulfate"],
-    "parabens": ["methylparaben", "ethylparaben", "propylparaben", "butylparaben", "isobutylparaben"],
-    "fragrance": ["parfum", "aroma", "fragrance", "linalool", "limonene", "geraniol", "citronellol", "eugenol"],
-    "phenoxyethanol": ["phenoxyethanol", "2-phenoxyethanol"],
-    "formaldehyde releasers": ["dmdm hydantoin", "imidazolidinyl urea", "diazolidinyl urea", "quaternium-15"],
-    "silicones": ["dimethicone", "cyclomethicone", "amodimethicone", "cyclopentasiloxane", "dimethiconol"],
-    "isothiazolinones": ["methylisothiazolinone", "methylchloroisothiazolinone"], // Common in shampoos
-    "alcohols (drying)": ["alcohol denat", "isopropyl alcohol", "sd alcohol", "ethanol"],
-    "alcohols (fatty/safe)": ["cetyl alcohol", "stearyl alcohol", "cetearyl alcohol"],
-    "phthalates": ["diethyl phthalate", "dep"],
-    "mineral oil": ["paraffinum liquidum", "petrolatum", "cera microcristallina"],
-    "lanolin": ["lanolin", "adeps lanae", "lanolin alcohol"],
-    "nut oils": ["prunus amygdalus dulcis oil", "arachis hypogaea oil", "butyrospermum parkii butter"], // Almond, Peanut, Shea
-    "coconut derivatives": ["cocos nucifera oil", "cocamidopropyl betaine", "coconut acid"],
-    "vitamin c": ["ascorbic acid", "sodium ascorbyl phosphate", "ascorbyl palmitate"],
-    "vitamin e": ["tocopherol", "tocopheryl acetate", "tocopheryl nicotinate"],
-    "disperse": ["disperse blue 1", "d&c blue no. 6"],
-    "lanolin": ["lanolin", "adeps lanae", "lanolin alcohol"],
-    "peruvian balsam": ["myroxylon pereirae", "balsam of peru","beaume du perou"]
-    
+    // --- DICTIONARY ---
+    const allergyDict = {
+        "sulfates": ["sodium lauryl sulfate", "sodium laureth sulfate", "ammonium lauryl sulfate", "sulfate de sodium"],
+        "fragrance": ["parfum", "aroma", "fragrance", "linalool", "limonene", "geraniol", "citronellol"],
+        "parabens": ["methylparaben", "ethylparaben", "propylparaben", "butylparaben"],
+        "phenoxyethanol": ["phenoxyethanol", "2-phenoxyethanol"],
+        "silicones": ["dimethicone", "cyclomethicone", "cyclopentasiloxane"],
+        "nut oils": ["prunus amygdalus dulcis", "arachis hypogaea", "shea butter", "butyrospermum parkii"],
+        "vitamin e": ["tocopherol", "tocopheryl acetate"],
+        "coconut": ["cocos nucifera", "cocamidopropyl betaine"]
+    };
 
-};
+    let userAllergies = JSON.parse(localStorage.getItem('safescan_allergies')) || ["Sulfate"];
 
-
-
-    let myAllergies = JSON.parse(localStorage.getItem('canadianAllergies')) || ["sulfates"];
-// 1. Populate the dropdown when the app starts
-function populateDropdown() {
-    const select = document.getElementById('common-allergy-select');
-    // Get all keys from your dictionary (sulfate, vitamin e, etc.)
-    const commonNames = Object.keys(allergyDict);
-    
-    commonNames.forEach(name => {
-        const option = document.createElement('option');
-        option.value = name;
-        // Capitalize the first letter for the display
-        option.textContent = name.charAt(0).toUpperCase() + name.slice(1);
-        select.appendChild(option);
-    });
-}
-
-// 2. Function to add the selected item from the dropdown
-function addFromDropdown() {
-    const select = document.getElementById('common-allergy-select');
-    const selectedValue = select.value;
-    
-    if (selectedValue && !myAllergies.includes(selectedValue)) {
-        myAllergies.push(selectedValue);
-        saveAndRefresh();
-        select.value = ""; // Reset dropdown
-    }
-}
-
-// 3. Helper to save and update UI (reusing your existing logic)
-function saveAndRefresh() {
-    localStorage.setItem('canadianAllergies', JSON.stringify(myAllergies));
-    displayAllergies();
-}
-
-    // --- UI LOGIC ---
-    function switchTab(view) {
-        document.querySelectorAll('.tool-view').forEach(v => v.classList.add('hidden'));
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(view + '-view').classList.remove('hidden');
-        event.target.classList.add('active');
-        
-        if(view === 'barcode') startScanner();
-        else html5QrCode.stop();
-    }
-
-    function displayAllergies() {
-        const list = document.getElementById('allergy-list');
-        list.innerHTML = myAllergies.map((a, i) => `
-            <span class="tag">${a} <span class="tag-remove" onclick="removeAllergy(${i})">×</span></span>
-        `).join('');
-    }
-
-    function addAllergy() {
-        const input = document.getElementById('allergy-input');
-        if(input.value) {
-            myAllergies.push(input.value.trim());
-            localStorage.setItem('canadianAllergies', JSON.stringify(myAllergies));
-            input.value = '';
-            displayAllergies();
-        }
-    }
-
-    function removeAllergy(i) {
-        myAllergies.splice(i, 1);
-        localStorage.setItem('canadianAllergies', JSON.stringify(myAllergies));
-        displayAllergies();
-    }
-
-    // --- ANALYSIS ENGINE ---
-    function runAnalysis(productName, ingredients) {
+    // --- CORE LOGIC ---
+    function runAnalysis(productName, rawText) {
         const resultArea = document.getElementById('result-area');
-        resultArea.classList.remove('hidden');
+        resultArea.style.display = 'block';
         
-        const lowerIng = ingredients.toLowerCase();
-        let triggers = [];
+        // Clean text: Unicode-aware (L = Letters, N = Numbers, s = whitespace)
+        const cleanText = rawText.toLowerCase()
+            .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
 
-        myAllergies.forEach(allergy => {
+        let found = [];
+        userAllergies.forEach(allergy => {
             const aLower = allergy.toLowerCase();
-            if(lowerIng.includes(aLower)) triggers.push(allergy);
-            else if(allergyDict[aLower]) {
-                const syn = allergyDict[aLower].find(s => lowerIng.includes(s));
-                if(syn) triggers.push(`${allergy} (${syn})`);
+            if (cleanText.includes(aLower)) {
+                found.push(allergy);
+            } else if (allergyDict[aLower]) {
+                const match = allergyDict[aLower].find(s => cleanText.includes(s));
+                if (match) found.push(`${allergy} (as "${match}")`);
             }
         });
 
-        const isSafe = triggers.length === 0;
+        const safe = found.length === 0;
         resultArea.innerHTML = `
-            <div class="status-box ${isSafe ? 'status-safe' : 'status-warning'}">
-                ${isSafe ? '✅ APPEARS SAFE' : '⚠️ WARNING: TRIGGER FOUND'}
+            <div class="status-banner ${safe ? 'success-banner' : 'danger-banner'}">
+                ${safe ? '✅ APPEARS SAFE' : '⚠️ TRIGGER FOUND'}
             </div>
-            <h3>${productName}</h3>
-            ${!isSafe ? `<p style="color:var(--danger)"><strong>Found:</strong> ${triggers.join(', ')}</p>` : ''}
-            <div class="ingredients-detail">
-                <strong>Ingredients Found:</strong><br>${ingredients}
-            </div>
-            <button class="btn-add" style="margin-top:15px; width:100%; background:#64748b;" onclick="location.reload()">Reset</button>
+            <strong style="font-size:1.1rem;">${productName}</strong>
+            ${!safe ? `<p style="color:var(--danger); font-weight:bold;">Avoid: ${found.join(', ')}</p>` : ''}
+            <details style="margin-top:15px; font-size:0.8rem; color:#64748b;">
+                <summary>View Analyzed Text</summary>
+                <p>${rawText}</p>
+            </details>
+            <button class="btn btn-secondary" style="width:100%; margin-top:15px;" onclick="resetApp()">New Scan</button>
         `;
+        window.scrollTo(0, document.body.scrollHeight);
     }
 
-    // --- BARCODE SCANNER ---
-    const html5QrCode = new Html5Qrcode("reader");
+    // --- TOOL FUNCTIONS ---
+    const scanner = new Html5Qrcode("reader");
+
+    function switchTab(e, view) {
+        document.querySelectorAll('.tool-view').forEach(v => v.classList.add('hidden'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(view + '-view').classList.remove('hidden');
+        e.target.classList.add('active');
+        
+        if (view === 'barcode') startScanner();
+        else scanner.stop().catch(() => {});
+    }
+
     function startScanner() {
-        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
-            html5QrCode.stop();
-            fetchProduct(text);
+        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+            scanner.stop().then(() => fetchBarcode(text));
         }).catch(() => {});
     }
 
-    async function fetchProduct(barcode) {
-        document.getElementById('result-area').innerHTML = "Searching OpenBeautyFacts...";
-        document.getElementById('result-area').classList.remove('hidden');
-        try {
-            const res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${barcode}.json`);
-            const data = await res.json();
-            if(data.status === 1) runAnalysis(data.product.product_name, data.product.ingredients_text);
-            else document.getElementById('result-area').innerHTML = "Product not in database. Use Photo OCR instead!";
-        } catch(e) { alert("API Error"); }
+    async function fetchBarcode(code) {
+        const res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${code}.json`);
+        const data = await res.json();
+        if (data.status === 1) runAnalysis(data.product.product_name || "Barcode Product", data.product.ingredients_text || "");
+        else alert("Product not found in database.");
     }
 
-    // --- OCR ---
-    async function processOCR(e) {
-        const status = document.getElementById('ocr-status');
-        status.innerText = "Initializing OCR Engine...";
-        const worker = await Tesseract.createWorker(['eng', 'fra']); // Bilingual support
+    async function handleOCR(e) {
+        const loader = document.getElementById('ocr-loader');
+        loader.classList.remove('hidden');
+        const worker = await Tesseract.createWorker(['eng', 'fra']);
         const { data: { text } } = await worker.recognize(e.target.files[0]);
         await worker.terminate();
+        loader.classList.add('hidden');
         runAnalysis("Scanned Label", text);
     }
 
-    // --- URL SCRAPER ---
-    async function checkByUrl() {
+    async function scrapeUrl() {
         const url = document.getElementById('url-input').value;
-        const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-        const res = await fetch(proxy);
+        const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
         const data = await res.json();
         const doc = new DOMParser().parseFromString(data.contents, 'text/html');
-        const text = doc.getElementById('ingred-list')?.innerText || "Could not find ingredients.";
-        runAnalysis("Website Result", text);
+        const ings = doc.getElementById('ingred-list')?.innerText || "Ingredients not found.";
+        runAnalysis("Website Link", ings);
     }
 
-    // Start
-    displayAllergies();
-    populateDropdown();
-    displayAllergies();
- //   startScanner();
-</script>
+    function analyzeManual() {
+        runAnalysis("Manual Paste", document.getElementById('manual-input').value);
+    }
 
+    // --- SETTINGS LOGIC ---
+    function init() {
+        const drop = document.getElementById('allergy-dropdown');
+        Object.keys(allergyDict).sort().forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k; opt.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+            drop.appendChild(opt);
+        });
+        updateTags();
+        startScanner();
+    }
+
+    function addFromDropdown() {
+        const val = document.getElementById('allergy-dropdown').value;
+        if (!userAllergies.includes(val)) {
+            userAllergies.push(val);
+            saveTags();
+        }
+    }
+
+    function addCustom() {
+        const inp = document.getElementById('custom-allergy');
+        if (inp.value) {
+            userAllergies.push(inp.value.trim());
+            inp.value = '';
+            saveTags();
+        }
+    }
+
+    function removeTag(i) {
+        userAllergies.splice(i, 1);
+        saveTags();
+    }
+
+    function saveTags() {
+        localStorage.setItem('safescan_allergies', JSON.stringify(userAllergies));
+        updateTags();
+    }
+
+    function updateTags() {
+        document.getElementById('tag-list').innerHTML = userAllergies.map((a, i) => `
+            <div class="tag">${a} <span class="tag-remove" onclick="removeTag(${i})">×</span></div>
+        `).join('');
+    }
+
+    function clearManual() { document.getElementById('manual-input').value = ""; }
+    function resetApp() { location.reload(); }
+
+    window.onload = init;
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+</script>
 </body>
 </html>
