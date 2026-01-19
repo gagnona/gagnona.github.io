@@ -259,7 +259,8 @@ console.log(rawText , cleanText);
     }
 
     function analyzeManual() {
-        const cleanText = removeAccents(document.getElementById('manual-input').value).replace(/%\w\w/g, ' ');
+        let cleanText = removeAccents(document.getElementById('manual-input').value)
+        cleanText=cleanText.replace(/%\w\w/g, ' ');
         document.getElementById('manual-input').value = cleanText;   
         runAnalysis("Manual Paste", cleanText); 
     }
