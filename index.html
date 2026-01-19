@@ -180,7 +180,7 @@
         const cleanText = rawText.toLowerCase()
             .replace(/[^\p{L}\p{N}\s]/gu, ' ')
             .replace(/\s+/g, ' ')
-            .replace(/%\w\w/g, ' ')
+            
             .trim();
 console.log(rawText , cleanText);
         let found = [];
@@ -220,7 +220,7 @@ console.log(rawText , cleanText);
         e.target.classList.add('active');
         
         if (view === 'barcode') startScanner();
-        else scanner.stop().catch(() => {});
+    //    else scanner.stop().catch(() => {});
     }
 
     function startScanner() {
@@ -254,9 +254,14 @@ console.log(rawText , cleanText);
         const ings = doc.getElementById('ingred-list')?.innerText || "Ingredients not found.";
         runAnalysis("Website Link", ings);
     }
+    function removeAccents(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
 
     function analyzeManual() {
-        runAnalysis("Manual Paste", document.getElementById('manual-input').value);
+        const cleanText = removeAccents(document.getElementById('manual-input').value).replace(/%\w\w/g, ' ');
+        document.getElementById('manual-input').value = cleanText;   
+        runAnalysis("Manual Paste", cleanText); 
     }
 
     // --- SETTINGS LOGIC ---
