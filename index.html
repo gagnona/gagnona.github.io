@@ -255,7 +255,8 @@ console.log(rawText , cleanText);
         runAnalysis("Website Link", ings);
     }
     function removeAccents(str) {
-        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return str.normalize("NFKD");
+    r   // return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
     function analyzeManual() {
