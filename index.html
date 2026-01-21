@@ -663,11 +663,11 @@
         let cleanText = document.getElementById("manual-input").value;
         //cleanText = removeAccents(document.getElementById('manual-input').value)
    //     if (isApplePhoneOrTablet()) {
+             myLog("This is an Apple phone or tablet. and encoded? " + containsEncodedComponents(cleanText)) ;
+                myLog( " decode --" + decodeURI(cleanText) +"-- " );
+                myLog( "utf8 --" + utf8Toutf16(cleanText) + "-- " + cleanText);
             
-            myLog("This is an Apple phone or tablet. and encoded? " + 
-                containsEncodedComponents(cleanText) + 
-                " decode" + decodeURI(cleanText)  );
-                cleantext = decodeURI(cleanText);
+
         // } else {
         //   myLog("This is not an Apple phone or tablet.");
         //   cleantext = utf8Toutf16(utf8Toutf16(cleanText));
