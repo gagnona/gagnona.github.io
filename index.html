@@ -204,7 +204,7 @@
       <header>
         <h1>🛡️ SafeScan Canada</h1>
         <p style="font-size: 0.8rem; color: #64748b">
-          Jan 20 2026 20:15
+          Jan 20 2026 20:44   Test push zut
         </p>
       </header>
 
@@ -662,7 +662,7 @@
       function analyzeManual() {
         let cleanText = document.getElementById("manual-input").value;
         //cleanText = removeAccents(document.getElementById('manual-input').value)
-        if (!isApplePhoneOrTablet()) {
+        if (isApplePhoneOrTablet()) {
             
             myLog("This is an Apple phone or tablet. and encoded? " + 
                 containsEncodedComponents(cleanText) + 
