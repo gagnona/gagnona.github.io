@@ -204,7 +204,7 @@
       <header>
         <h1>🛡️ SafeScan Canada</h1>
         <p style="font-size: 0.8rem; color: #64748b">
-          Jan 20 2026 20:44   Test push zut
+          Jan 20 2026 20:44 Test push zut
         </p>
       </header>
 
@@ -323,14 +323,52 @@
 
     <script>
       // --- DICTIONARY ---
+
+      const GigiAllergens = [
+        "Lanoline",
+        "Bacitracin",
+        "Paraben",
+        "alcool benzylique",
+        "baulme du perou",
+      ];
+      const fragranceMixes = [
+        {
+          id: "Mix II",
+          label: "Fragrance mix II",
+          ingredients: [
+            "LYRAL",
+            "CITRAL",
+            "FARNESOL",
+            "CITRONELLOL",
+            "HEXYL CINNAMIC ALDEHYDE",
+            "COUMARIN",
+          ],
+        },
+        {
+          id: "Mix I",
+          label: "Fragrance mix I",
+          ingredients: ["GÉRANIOL", "EUGÉNOL", "ISOEUGÉNOL", "oakmoss abs."],
+        },
+      ];
       const allergyDict = {
-        sulfates: [
+        "baume du perou": ["balsam of peru", "baume du perou"],  
+        "alcool benzylique": ["benzyl alcohol", "alcool benzylique"],
+        sulfate: [
+            "laurylsulfate de sodium",
+          "laurethsulfate de sodium",
+          "laurylsulfate d ammonium",
+          "coco-sulfate de sodium",
           "sodium lauryl sulfate",
           "sodium laureth sulfate",
           "ammonium lauryl sulfate",
           "sodium coco-sulfate",
         ],
-        parabens: [
+        paraben: [
+           "méthylparabène",
+          "éthylparabène",
+          "propylparabène",
+          "butylparabène",
+          "isobutylparabène",
           "methylparaben",
           "ethylparaben",
           "propylparaben",
@@ -353,6 +391,13 @@
           "imidazolidinyl urea",
           "diazolidinyl urea",
           "quaternium-15",
+
+        ],
+            "libérateurs de formaldéhyde": [
+          "DMDM hydantoïne",
+          "imidazolidinylurée",
+          "diazolidinylurée",
+          "quaternium-15",
         ],
         silicones: [
           "dimethicone",
@@ -370,11 +415,19 @@
           "isopropyl alcohol",
           "sd alcohol",
           "ethanol",
+           "alcool dénaturé",
+          "alcool isopropylique",
+          "alcool SD",
+          "éthanol",
         ],
         "alcohols (fatty/safe)": [
           "cetyl alcohol",
           "stearyl alcohol",
           "cetearyl alcohol",
+                    "alcool cétylique",
+          "alcool stéarylique",
+          "alcool cétéarylique",
+
         ],
         phthalates: ["diethyl phthalate", "dep"],
         "mineral oil": [
@@ -382,26 +435,48 @@
           "petrolatum",
           "cera microcristallina",
         ],
-        lanolin: ["lanolin", "adeps lanae", "lanolin alcohol"],
-        "nut oils": [
-          "prunus amygdalus dulcis oil",
-          "arachis hypogaea oil",
-          "butyrospermum parkii butter",
-        ], // Almond, Peanut, Shea
-        "coconut derivatives": [
+           "huile minérale": [
+          "paraffinum liquidum",
+          "petrolatum",
+          "cera microcristallina",
+        ],
+        lanolin: ["lanolin", "adeps lanae", "lanolin alcohol","lanoline","alcool de lanoline"],
+
+        "dérivés de noix de coco": [
+          "huile de cocos nucifera",
+          "cocamidopropyl bétaïne",
+          "acide coco",
           "cocos nucifera oil",
           "cocamidopropyl betaine",
           "coconut acid",
         ],
-        "vitamin c": [
+
+        "huiles de noix": [
+          "huile de prunus amygdalus dulcis",
+          "huile d'arachide hypogaea",
+          "beurre de butyrospermum parki",
+                   "prunus amygdalus dulcis oil",
+          "arachis hypogaea oil",
+          "butyrospermum parkii butter",
+
+        ], // Amande, arachide, karité
+        "vitamine c": [
+          "acide ascorbique",
+          "phosphate d'ascorbyle de sodium",
+          "palmitate d'ascorbyle",
+
           "ascorbic acid",
           "sodium ascorbyl phosphate",
           "ascorbyl palmitate",
         ],
-        "vitamin e": [
+
+        "vitamine e": [
           "tocopherol",
           "tocopheryl acetate",
           "tocopheryl nicotinate",
+                   "tocophérol",
+          "acétate de tocophéryle",
+          "nicotinate de tocophéryle",
         ],
       };
       const allergyDictFr = {
@@ -487,7 +562,7 @@
 
       let userAllergies = JSON.parse(
         localStorage.getItem("safescan_allergies"),
-      ) || ["sulfate"];
+      ) || GigiAllergens;
 
       // --- CORE LOGIC ---
       function runAnalysis(productName, rawText) {
@@ -597,50 +672,9 @@
           "Ingredients not found.";
         runAnalysis("Website Link", ings);
       }
-      function removeAccentsbad(str) {
-        // Create a TextDecoder instance (defaults to 'utf-8')
-        const decoder = new TextDecoder("utf-8");
 
-        // Assume you have a Uint8Array of UTF-8 encoded data
-        const encodedData = str;
-
-        // Decode the byte array back to a string
-        const decodedString = decoder.decode(encodedData);
-
-        console.log(decodedString);
-        // return str.normalize("NFKD").replace(!/[\u0000-\u007F]/g, "");
-        // return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        return decodedString.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      }
       function removeAccents(decodedString) {
         return decodedString.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      }
-      function containsEncodedComponents(x) {
-        // ie ?,=,&,/ etc
-        return decodeURI(x) !== decodeURIComponent(x);
-      }
-
-      function stringToArrayBufferUTF8(str) {
-        const encoder = new TextEncoder();
-        // encode() returns a Uint8Array
-        const uint8Array = encoder.encode(str);
-        // Access the underlying ArrayBuffer
-        return uint8Array.buffer;
-      }
-
-      // Decode the UTF-8 bytes into a standard JavaScript string (which is UTF-16 internally)
-      function utf8Toutf16(utf8EncodedData) {
-        const decoder = new TextDecoder("utf-8");
-        try {
-            let jsString = decoder.decode(utf8EncodedData);
-            // Code that may cause an error
-        } catch (error) {
-            myLog("Erreur de décodage UTF-8");    // Code to handle the error
-            jsString = utf8EncodedData; // Fallback to original data
-}
-
-        console.log(jsString); // Output: "Hello"
-        return jsString;
       }
 
       function isApplePhoneOrTablet() {
@@ -655,26 +689,24 @@
       }
       //
       function myLog(str) {
-                   document.getElementById('manual-input').value += (" ** " + str)  ;
-
-      } 
+        document.getElementById("manual-input").value += " ** " + str;
+      }
 
       function analyzeManual() {
         let cleanText = document.getElementById("manual-input").value;
         //cleanText = removeAccents(document.getElementById('manual-input').value)
-        if (isApplePhoneOrTablet()) {
-            
-            myLog("This is an Apple phone or tablet. and encoded? " + 
-                containsEncodedComponents(cleanText) + 
-                " decode" + decodeURI(cleanText)  );
-                cleantext = decodeURI(cleanText);
-        } else {
-          myLog("This is not an Apple phone or tablet.");
-          cleantext = utf8Toutf16(utf8Toutf16(cleanText));
-        }
+        //     if (isApplePhoneOrTablet()) {
+
+        //     myLog("This is an Apple phone or tablet. and encoded? " + cleanText) ;
+        //         myLog( " length --" + cleanText.length );
+        //         myLog( " utf8to16 --" + utf8Toutf16(cleanText) + "-- " );
+        // // } else {
+        //   myLog("This is not an Apple phone or tablet.");
+        //   cleantext = utf8Toutf16(utf8Toutf16(cleanText));
+        // }
         cleanText = removeAccents(cleanText);
-        //    cleanText=cleanText.replace(/%\w\w/g, ' ');
-           myLog(cleanText)  ;
+        cleanText = cleanText.replace(/%\w\w/g, " ");
+        //    myLog(cleanText)  ;
 
         runAnalysis("Manual Paste", cleanText);
       }
