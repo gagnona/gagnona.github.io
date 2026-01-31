@@ -204,7 +204,7 @@
       <header>
         <h1>🛡️ SafeScan Canada</h1>
         <p style="font-size: 0.8rem; color: #64748b">
-          Jan 30 2026 18:50 GMT - Updated allergen list git
+          Jan 30 2026 22:50  - + GigiAllergens
         </p>
       </header>
 
@@ -562,7 +562,7 @@
 
       let userAllergies = JSON.parse(
         localStorage.getItem("safescan_allergies"),
-      ) || GigiAllergens;
+      ) + GigiAllergens;
 
       // --- CORE LOGIC ---
       function runAnalysis(productName, rawText) {
