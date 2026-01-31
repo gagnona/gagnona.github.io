@@ -560,11 +560,12 @@
         ],
       };
 
-      let userAllergies = JSON.parse(
-        localStorage.getItem("safescan_allergies"),
-      ) + GigiAllergens;
+      let userAllergies = JSON.parse(localStorage.getItem("safescan_allergies")) || [];
+      if (userAllergies.length === 0) {
+        userAllergies = GigiAllergens;
+      }
 
-      // --- CORE LOGIC ---
+      // --- CORE LOGIC ---  
       function runAnalysis(productName, rawText) {
         const resultArea = document.getElementById("result-area");
         resultArea.style.display = "block";
