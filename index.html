@@ -204,7 +204,7 @@
       <header>
         <h1>🛡️ SafeScan Canada</h1>
         <p style="font-size: 0.8rem; color: #64748b">
-          Jan 30 2026 22:50  - + GigiAllergens
+          Jan 30 2026 22:50  - + GigiAllergens + depart paste
         </p>
       </header>
 
@@ -244,7 +244,7 @@
         <button class="tab" onclick="switchTab(event, 'link')">URL</button>
       </div>
 
-      <div id="barcode-view" class="tool-view">
+      <div id="barcode-view" class="tool-view hidden">
         <div id="reader"></div>
         <p style="text-align: center; color: #64748b; font-size: 0.8rem">
           Center barcode in square
@@ -725,7 +725,8 @@
             drop.appendChild(opt);
           });
         updateTags();
-        analyzeManual();
+        //analyzeManual();
+        switchTab(event, 'manual')
         // -- don't startScanner();
       }
 
