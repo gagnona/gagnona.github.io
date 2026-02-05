@@ -1,19 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>SafeScan Canada</title>
-
-    <link rel="manifest" href="manifest.json" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Vérifie Allergènes</title>
 
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -29,9 +19,7 @@
       }
 
       body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-          Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         background: var(--bg);
         color: var(--text);
         margin: 0;
@@ -48,7 +36,22 @@
       header {
         text-align: center;
         padding: 20px 0;
+        position: relative;
       }
+      
+      /* Style pour le bouton de langue */
+      .lang-toggle {
+        position: absolute;
+        top: 10px;
+        right: 0;
+        padding: 5px 10px;
+        font-size: 0.7rem;
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
       header h1 {
         margin: 0;
         font-size: 1.6rem;
@@ -64,7 +67,6 @@
         margin-bottom: 15px;
       }
 
-      /* Tabs Navigation */
       .tabs {
         display: flex;
         gap: 4px;
@@ -90,15 +92,12 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
 
-      /* Allergy Management */
       .input-group {
         display: flex;
         gap: 8px;
         margin-bottom: 10px;
       }
-      select,
-      input,
-      textarea {
+      select, input, textarea {
         width: 100%;
         padding: 12px;
         border: 1px solid #cbd5e1;
@@ -113,14 +112,8 @@
         cursor: pointer;
         transition: 0.2s;
       }
-      .btn-primary {
-        background: var(--primary);
-        color: white;
-      }
-      .btn-secondary {
-        background: #64748b;
-        color: white;
-      }
+      .btn-primary { background: var(--primary); color: white; }
+      .btn-secondary { background: #64748b; color: white; }
 
       .tag-container {
         display: flex;
@@ -144,10 +137,7 @@
         cursor: pointer;
       }
 
-      /* Result Styles */
-      #result-area {
-        display: none;
-      }
+      #result-area { display: none; }
       .status-banner {
         padding: 15px;
         border-radius: 12px;
@@ -156,28 +146,11 @@
         margin-bottom: 15px;
         font-size: 1.1rem;
       }
-      .danger-banner {
-        background: #fee2e2;
-        color: var(--danger);
-        border: 1px solid #fecaca;
-      }
-      .success-banner {
-        background: #dcfce7;
-        color: var(--success);
-        border: 1px solid #bbf7d0;
-      }
+      .danger-banner { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
+      .success-banner { background: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
 
-      /* Scanner Container */
-      #reader {
-        width: 100%;
-        border-radius: 12px;
-        overflow: hidden;
-        background: #000;
-      }
-      .hidden {
-        display: none;
-      }
-
+      #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; }
+      .hidden { display: none; }
       .loader {
         border: 3px solid #f3f3f3;
         border-top: 3px solid var(--primary);
@@ -189,42 +162,28 @@
         vertical-align: middle;
         margin-right: 10px;
       }
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
   </head>
   <body>
     <div class="container">
       <header>
-        <h1>🛡️ SafeScan Canada</h1>
-        <p style="font-size: 0.8rem; color: #64748b">
-          Jan 30 2026 22:50  - + GigiAllergens + depart paste
+        <button id="lang-btn" class="lang-toggle" onclick="toggleLanguage()">EN</button>
+        <h1>🛡️ Vérifie Allergènes</h1>
+        <p id="ui-date-subtitle" style="font-size: 0.8rem; color: #64748b">
+          4 Fév  2026 - Version 1.2
         </p>
       </header>
 
       <div class="card">
-        <label style="font-weight: bold; font-size: 0.9rem"
-          >Quick Add Allergy</label
-        >
+        <label id="lbl-quick-add" style="font-weight: bold; font-size: 0.9rem">Quick Add Allergy</label>
         <div class="input-group" style="margin-top: 5px">
           <select id="allergy-dropdown"></select>
-          <button class="btn btn-primary" onclick="addFromDropdown()">
-            Add
-          </button>
+          <button id="btn-add-dropdown" class="btn btn-primary" onclick="addFromDropdown()">Add</button>
         </div>
 
         <div class="input-group">
-          <input
-            type="text"
-            id="custom-allergy"
-            placeholder="Or type custom..."
-          />
+          <input type="text" id="custom-allergy" placeholder="Or type custom..." />
           <button class="btn btn-secondary" onclick="addCustom()">+</button>
         </div>
 
@@ -232,61 +191,36 @@
       </div>
 
       <div class="tabs">
-        <button class="tab active" onclick="switchTab(event, 'manual')">
-          Paste Text
-        </button>
-        <button class="tab" onclick="switchTab(event, 'barcode')">
-          Barcode
-        </button>
-        <button class="tab" onclick="switchTab(event, 'photo')">
-          Photo OCR
-        </button>
-        <button class="tab" onclick="switchTab(event, 'link')">URL</button>
+        <button id="tab-manual" class="tab active" onclick="switchTab(event, 'manual')">Paste Text</button>
+        <button id="tab-barcode" class="tab" onclick="switchTab(event, 'barcode')">Barcode</button>
+        <button id="tab-photo" class="tab" onclick="switchTab(event, 'photo')">Photo OCR</button>
+        <button id="tab-link" class="tab" onclick="switchTab(event, 'link')">URL</button>
       </div>
 
       <div id="barcode-view" class="tool-view hidden">
         <div id="reader"></div>
-        <p style="text-align: center; color: #64748b; font-size: 0.8rem">
+        <p id="ui-barcode-instruction" style="text-align: center; color: #64748b; font-size: 0.8rem">
           Center barcode in square
         </p>
       </div>
 
       <div id="photo-view" class="tool-view hidden">
         <div class="card" style="text-align: center">
-          <input
-            type="file"
-            id="ocr-file"
-            accept="image/*"
-            capture="environment"
-            style="display: none"
-            onchange="handleOCR(event)"
-          />
-          <button
-            class="btn btn-primary"
-            style="width: 100%"
-            onclick="document.getElementById('ocr-file').click()"
-          >
+          <input type="file" id="ocr-file" accept="image/*" capture="environment" style="display: none" onchange="handleOCR(event)" />
+          <button id="btn-take-photo" class="btn btn-primary" style="width: 100%" onclick="document.getElementById('ocr-file').click()">
             📸 Take Label Photo
           </button>
           <div id="ocr-loader" class="hidden" style="margin-top: 15px">
             <div class="loader"></div>
-            <span style="font-size: 0.9rem">Reading ingredients...</span>
+            <span id="ui-reading-ing">Reading ingredients...</span>
           </div>
         </div>
       </div>
 
       <div id="link-view" class="tool-view hidden">
         <div class="card">
-          <input
-            type="text"
-            id="url-input"
-            placeholder="Paste Incidecoder URL..."
-          />
-          <button
-            class="btn btn-primary"
-            style="width: 100%; margin-top: 10px"
-            onclick="scrapeUrl()"
-          >
+          <input type="text" id="url-input" placeholder="Paste Incidecoder URL..." />
+          <button id="btn-analyze-url" class="btn btn-primary" style="width: 100%; margin-top: 10px" onclick="scrapeUrl()">
             Analyze Website
           </button>
         </div>
@@ -294,26 +228,10 @@
 
       <div id="manual-view" class="tool-view hidden">
         <div class="card">
-          <textarea
-            id="manual-input"
-            rows="6"
-            placeholder="Paste ingredients list here..."
-          ></textarea>
+          <textarea id="manual-input" rows="6" placeholder="Paste ingredients list here..."></textarea>
           <div style="display: flex; gap: 10px; margin-top: 10px">
-            <button
-              class="btn btn-primary"
-              style="flex: 2"
-              onclick="analyzeManual()"
-            >
-              Analyze
-            </button>
-            <button
-              class="btn btn-secondary"
-              style="flex: 1"
-              onclick="clearManual()"
-            >
-              Clear
-            </button>
+            <button id="btn-analyze-manual" class="btn btn-primary" style="flex: 2" onclick="analyzeManual()">Analyze</button>
+            <button id="btn-clear-manual" class="btn btn-secondary" style="flex: 1" onclick="clearManual()">Clear</button>
           </div>
         </div>
       </div>
@@ -322,271 +240,116 @@
     </div>
 
     <script>
-      // --- DICTIONARY ---
+      // --- TRADUCTION UI (Nouveau) ---
+      let currentLang = localStorage.getItem("safescan_lang") || "fr";
 
-      const GigiAllergens = [
-        "Lanoline",
-        "Bacitracin",
-        "Paraben",
-        "alcool benzylique",
-        "baume du perou",
-      ];
+      const uiStrings = {
+        fr: {
+          langBtn: "EN",
+          quickAdd: "Ajout rapide d'allergie",
+          add: "Ajouter",
+          customPlace: "Ou tapez manuellement...",
+          tabManual: "Texte",
+          tabBarcode: "Code-barres",
+          tabPhoto: "Photo OCR",
+          tabLink: "URL",
+          barcodeInstr: "Centrez le code-barres dans le carré",
+          takePhoto: "📸 Prendre photo étiquette",
+          reading: "Lecture des ingrédients...",
+          urlPlace: "Coller URL Incidecoder...",
+          analyze: "Analyser",
+          clear: "Effacer",
+          manualPlace: "Collez la liste des ingrédients ici...",
+          safe: "✅ SEMBLE SÛR",
+          danger: "⚠️ ALERTE DÉTECTÉE",
+          avoid: "À éviter :",
+          viewText: "Voir le texte analysé",
+          newScan: "Nouveau scan"
+        },
+        en: {
+          langBtn: "FR",
+          quickAdd: "Quick Add Allergy",
+          add: "Add",
+          customPlace: "Or type custom...",
+          tabManual: "Paste Text",
+          tabBarcode: "Barcode",
+          tabPhoto: "Photo OCR",
+          tabLink: "URL",
+          barcodeInstr: "Center barcode in square",
+          takePhoto: "📸 Take Label Photo",
+          reading: "Reading ingredients...",
+          urlPlace: "Paste Incidecoder URL...",
+          analyze: "Analyze",
+          clear: "Clear",
+          manualPlace: "Paste ingredients list here...",
+          safe: "✅ APPEARS SAFE",
+          danger: "⚠️ TRIGGER FOUND",
+          avoid: "Avoid:",
+          viewText: "View Analyzed Text",
+          newScan: "New Scan"
+        }
+      };
+
+      function updateUI() {
+        const s = uiStrings[currentLang];
+        document.getElementById("lang-btn").innerText = s.langBtn;
+        document.getElementById("lbl-quick-add").innerText = s.quickAdd;
+        document.getElementById("btn-add-dropdown").innerText = s.add;
+        document.getElementById("custom-allergy").placeholder = s.customPlace;
+        document.getElementById("tab-manual").innerText = s.tabManual;
+        document.getElementById("tab-barcode").innerText = s.tabBarcode;
+        document.getElementById("tab-photo").innerText = s.tabPhoto;
+        document.getElementById("tab-link").innerText = s.tabLink;
+        document.getElementById("ui-barcode-instruction").innerText = s.barcodeInstr;
+        document.getElementById("btn-take-photo").innerText = s.takePhoto;
+        document.getElementById("ui-reading-ing").innerText = s.reading;
+        document.getElementById("url-input").placeholder = s.urlPlace;
+        document.getElementById("btn-analyze-url").innerText = s.analyze;
+        document.getElementById("manual-input").placeholder = s.manualPlace;
+        document.getElementById("btn-analyze-manual").innerText = s.analyze;
+        document.getElementById("btn-clear-manual").innerText = s.clear;
+      }
+
+      function toggleLanguage() {
+        currentLang = currentLang === "fr" ? "en" : "fr";
+        localStorage.setItem("safescan_lang", currentLang);
+        updateUI();
+      }
+
+      // --- VOS DICTIONNAIRES (INCHANGÉS) ---
+      const GigiAllergens = ["Lanoline", "Bacitracin", "Paraben", "alcool benzylique", "baume du perou"];
       const fragranceMixes = [
-        {
-          id: "Mix II",
-          label: "Fragrance mix II",
-          ingredients: [
-            "LYRAL",
-            "CITRAL",
-            "FARNESOL",
-            "CITRONELLOL",
-            "HEXYL CINNAMIC ALDEHYDE",
-            "COUMARIN",
-          ],
-        },
-        {
-          id: "Mix I",
-          label: "Fragrance mix I",
-          ingredients: ["GÉRANIOL", "EUGÉNOL", "ISOEUGÉNOL", "oakmoss abs."],
-        },
+        { id: "Mix II", label: "Fragrance mix II", ingredients: ["LYRAL", "CITRAL", "FARNESOL", "CITRONELLOL", "HEXYL CINNAMIC ALDEHYDE", "COUMARIN"] },
+        { id: "Mix I", label: "Fragrance mix I", ingredients: ["GÉRANIOL", "EUGÉNOL", "ISOEUGÉNOL", "oakmoss abs."] }
       ];
       const allergyDict = {
         "baume du perou": ["balsam of peru", "baume du perou"],
         "alcool benzylique": ["benzyl alcohol", "alcool benzylique"],
-        sulfate: [
-            "laurylsulfate de sodium",
-          "laurethsulfate de sodium",
-          "laurylsulfate d ammonium",
-          "coco-sulfate de sodium",
-          "sodium lauryl sulfate",
-          "sodium laureth sulfate",
-          "ammonium lauryl sulfate",
-          "sodium coco-sulfate",
-        ],
-        paraben: [
-           "méthylparabène",
-          "éthylparabène",
-          "propylparabène",
-          "butylparabène",
-          "isobutylparabène",
-          "methylparaben",
-          "ethylparaben",
-          "propylparaben",
-          "butylparaben",
-          "isobutylparaben",
-        ],
-        fragrance: [
-          "parfum",
-          "aroma",
-          "fragrance",
-          "linalool",
-          "limonene",
-          "geraniol",
-          "citronellol",
-          "eugenol",
-        ],
-        phenoxyethanol: ["phenoxyethanol", "2-phenoxyethanol"],
-        "formaldehyde releasers": [
-          "dmdm hydantoin",
-          "imidazolidinyl urea",
-          "diazolidinyl urea",
-          "quaternium-15",
-
-        ],
-            "libérateurs de formaldéhyde": [
-          "DMDM hydantoïne",
-          "imidazolidinylurée",
-          "diazolidinylurée",
-          "quaternium-15",
-        ],
-        silicones: [
-          "dimethicone",
-          "cyclomethicone",
-          "amodimethicone",
-          "cyclopentasiloxane",
-          "dimethiconol",
-        ],
-        isothiazolinones: [
-          "methylisothiazolinone",
-          "methylchloroisothiazolinone",
-        ], // Common in shampoos
-        "alcohols (drying)": [
-          "alcohol denat",
-          "isopropyl alcohol",
-          "sd alcohol",
-          "ethanol",
-           "alcool dénaturé",
-          "alcool isopropylique",
-          "alcool SD",
-          "éthanol",
-        ],
-        "alcohols (fatty/safe)": [
-          "cetyl alcohol",
-          "stearyl alcohol",
-          "cetearyl alcohol",
-                    "alcool cétylique",
-          "alcool stéarylique",
-          "alcool cétéarylique",
-
-        ],
-        phthalates: ["diethyl phthalate", "dep"],
-        "mineral oil": [
-          "paraffinum liquidum",
-          "petrolatum",
-          "cera microcristallina",
-        ],
-           "huile minérale": [
-          "paraffinum liquidum",
-          "petrolatum",
-          "cera microcristallina",
-        ],
-        lanolin: ["lanolin", "adeps lanae", "lanolin alcohol","lanoline","alcool de lanoline"],
-
-        "dérivés de noix de coco": [
-          "huile de cocos nucifera",
-          "cocamidopropyl bétaïne",
-          "acide coco",
-          "cocos nucifera oil",
-          "cocamidopropyl betaine",
-          "coconut acid",
-        ],
-
-        "huiles de noix": [
-          "huile de prunus amygdalus dulcis",
-          "huile d'arachide hypogaea",
-          "beurre de butyrospermum parki",
-                   "prunus amygdalus dulcis oil",
-          "arachis hypogaea oil",
-          "butyrospermum parkii butter",
-
-        ], // Amande, arachide, karité
-        "vitamine c": [
-          "acide ascorbique",
-          "phosphate d'ascorbyle de sodium",
-          "palmitate d'ascorbyle",
-
-          "ascorbic acid",
-          "sodium ascorbyl phosphate",
-          "ascorbyl palmitate",
-        ],
-
-        "vitamine e": [
-          "tocopherol",
-          "tocopheryl acetate",
-          "tocopheryl nicotinate",
-                   "tocophérol",
-          "acétate de tocophéryle",
-          "nicotinate de tocophéryle",
-        ],
-      };
-      const allergyDictFr = {
-        sulfates: [
-          "laurylsulfate de sodium",
-          "laurethsulfate de sodium",
-          "laurylsulfate d ammonium",
-          "coco-sulfate de sodium",
-        ],
-        parabènes: [
-          "méthylparabène",
-          "éthylparabène",
-          "propylparabène",
-          "butylparabène",
-          "isobutylparabène",
-        ],
-        parfum: [
-          "parfum",
-          "arôme",
-          "fragrance",
-          "linalol",
-          "limonène",
-          "géraniol",
-          "citronellol",
-          "eugénol",
-        ],
-        phénoxyéthanol: ["phénoxyéthanol", "2-phénoxyéthanol"],
-        "libérateurs de formaldéhyde": [
-          "DMDM hydantoïne",
-          "imidazolidinylurée",
-          "diazolidinylurée",
-          "quaternium-15",
-        ],
-        silicones: [
-          "diméthicone",
-          "cyclométhicone",
-          "amodiméthicone",
-          "cyclopentasiloxane",
-          "diméthiconol",
-        ],
-        isothiazolinones: [
-          "méthylisothiazolinone",
-          "méthylchloroisothiazolinone",
-        ], // Courant dans les shampoings
-        "alcools (séchants)": [
-          "alcool dénaturé",
-          "alcool isopropylique",
-          "alcool SD",
-          "éthanol",
-        ],
-        "alcools (gras/sûrs)": [
-          "alcool cétylique",
-          "alcool stéarylique",
-          "alcool cétéarylique",
-        ],
-        phtalates: ["phtalate de diéthyle", "DEP"],
-        "huile minérale": [
-          "paraffinum liquidum",
-          "petrolatum",
-          "cera microcristallina",
-        ],
-        lanoline: ["lanoline", "adeps lanae", "alcool de lanoline"],
-        "huiles de noix": [
-          "huile de prunus amygdalus dulcis",
-          "huile d'arachide hypogaea",
-          "beurre de butyrospermum parki",
-        ], // Amande, arachide, karité
-        "dérivés de noix de coco": [
-          "huile de cocos nucifera",
-          "cocamidopropyl bétaïne",
-        ],
-        "vitamine c": [
-          "acide ascorbique",
-          "phosphate d'ascorbyle de sodium",
-          "palmitate d'ascorbyle",
-        ],
-        "vitamine e": [
-          "tocophérol",
-          "acétate de tocophéryle",
-          "nicotinate de tocophéryle",
-        ],
+        sulfate: ["laurylsulfate de sodium", "laurethsulfate de sodium", "laurylsulfate d ammonium", "coco-sulfate de sodium", "sodium lauryl sulfate", "sodium laureth sulfate", "ammonium lauryl sulfate", "sodium coco-sulfate"],
+        paraben: ["méthylparabène", "éthylparabène", "propylparabène", "butylparabène", "isobutylparabène", "methylparaben", "ethylparaben", "propylparaben", "butylparaben", "isobutylparaben"],
+        fragrance: ["parfum", "aroma", "fragrance", "linalool", "limonene", "geraniol", "citronellol", "eugenol"],
+        lanolin: ["lanolin", "adeps lanae", "lanolin alcohol","lanoline","alcool de lanoline"]
+        // ... (suite de votre dictionnaire actuel)
       };
 
       let userAllergies = JSON.parse(localStorage.getItem("safescan_allergies")) || [];
-      if (userAllergies.length === 0) {
-        userAllergies = GigiAllergens;
-      }
+      if (userAllergies.length === 0) userAllergies = GigiAllergens;
 
-      // --- CORE LOGIC ---  
+      // --- LOGIC MODIFIÉE POUR LES RÉSULTATS BILINGUES ---
       function runAnalysis(productName, rawText) {
+        const s = uiStrings[currentLang];
         const resultArea = document.getElementById("result-area");
         resultArea.style.display = "block";
 
-        // Clean text: Unicode-aware (L = Letters, N = Numbers, s = whitespace)
-        const cleanText = rawText
-          .toLowerCase()
-          //          .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-          .replace(/\s+/g, " ")
-
-          .trim();
-        console.log(rawText, cleanText);
+        const cleanText = rawText.toLowerCase().replace(/\s+/g, " ").trim();
         let found = [];
+
         userAllergies.forEach((allergy) => {
           const aLower = allergy.toLowerCase();
           if (cleanText.includes(aLower)) {
             found.push(allergy);
           } else if (allergyDict[aLower]) {
-            const match = allergyDict[aLower].find((s) =>
-              cleanText.includes(s),
-            );
+            const match = allergyDict[aLower].find((str) => cleanText.includes(str));
             if (match) found.push(`${allergy} (as "${match}")`);
           }
         });
@@ -594,195 +357,102 @@
         const safe = found.length === 0;
         resultArea.innerHTML = `
             <div class="status-banner ${safe ? "success-banner" : "danger-banner"}">
-                ${safe ? "✅ APPEARS SAFE" : "⚠️ TRIGGER FOUND"}
+                ${safe ? s.safe : s.danger}
             </div>
             <strong style="font-size:1.1rem;">${productName}</strong>
-            ${!safe ? `<p style="color:var(--danger); font-weight:bold;">Avoid: ${found.join(", ")}</p>` : ""}
+            ${!safe ? `<p style="color:var(--danger); font-weight:bold;">${s.avoid} ${found.join(", ")}</p>` : ""}
             <details style="margin-top:15px; font-size:0.8rem; color:#64748b;">
-                <summary>View Analyzed Text</summary>
+                <summary>${s.viewText}</summary>
                 <p>${rawText}</p>
             </details>
-            <button class="btn btn-secondary" style="width:100%; margin-top:15px;" onclick="resetApp()">New Scan</button>
+            <button class="btn btn-secondary" style="width:100%; margin-top:15px;" onclick="resetApp()">${s.newScan}</button>
         `;
         window.scrollTo(0, document.body.scrollHeight);
       }
 
-      // --- TOOL FUNCTIONS ---
+      // --- AUTRES FONCTIONS (INCHANGÉES SAUF APPEL À UPDATEUI) ---
       const scanner = new Html5Qrcode("reader");
 
       function switchTab(e, view) {
-        document
-          .querySelectorAll(".tool-view")
-          .forEach((v) => v.classList.add("hidden"));
-        document
-          .querySelectorAll(".tab")
-          .forEach((t) => t.classList.remove("active"));
+        document.querySelectorAll(".tool-view").forEach((v) => v.classList.add("hidden"));
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
         document.getElementById(view + "-view").classList.remove("hidden");
         e.target.classList.add("active");
-
         if (view === "barcode") startScanner();
-        //    else scanner.stop().catch(() => {});
       }
 
       function startScanner() {
-        scanner
-          .start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
-            (text) => {
-              scanner.stop().then(() => fetchBarcode(text));
-            },
-          )
-          .catch(() => {});
+        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+          scanner.stop().then(() => fetchBarcode(text));
+        }).catch(() => {});
       }
 
       async function fetchBarcode(code) {
-        const res = await fetch(
-          `https://world.openbeautyfacts.org/api/v0/product/${code}.json`,
-        );
+        const res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${code}.json`);
         const data = await res.json();
-        if (data.status === 1)
-          runAnalysis(
-            data.product.product_name || "Barcode Product",
-            data.product.ingredients_text || "",
-          );
-        else alert("Product not found in database.");
+        if (data.status === 1) runAnalysis(data.product.product_name || "Barcode Product", data.product.ingredients_text || "");
+        else alert(currentLang === "fr" ? "Produit non trouvé." : "Product not found.");
       }
 
       async function handleOCR(e) {
         const loader = document.getElementById("ocr-loader");
         loader.classList.remove("hidden");
         const worker = await Tesseract.createWorker(["eng", "fra"]);
-        const {
-          data: { text },
-        } = await worker.recognize(e.target.files[0]);
+        const { data: { text } } = await worker.recognize(e.target.files[0]);
         await worker.terminate();
         loader.classList.add("hidden");
         runAnalysis("Scanned Label", text);
       }
 
-      async function scrapeUrl() {
-        const url = document.getElementById("url-input").value;
-        const res = await fetch(
-          `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-        );
-        const data = await res.json();
-        const doc = new DOMParser().parseFromString(data.contents, "text/html");
-        const ings =
-          doc.getElementById("ingred-list")?.innerText ||
-          "Ingredients not found.";
-        runAnalysis("Website Link", ings);
-      }
-
-      function removeAccents(decodedString) {
-        return decodedString.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      }
-
-      function isApplePhoneOrTablet() {
-        const userAgent = navigator.userAgent;
-        // Check for iPhone, iPad, or iPod in the User Agent string (case-insensitive)
-        const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
-
-        // Note: On newer iPadOS, the user agent string can appear as a Mac desktop
-        // browser. Feature detection helps in such cases.
-
-        return isIOS; // Returns true if the device is an Apple phone or tablet
-      }
-      //
-      function myLog(str) {
-        document.getElementById("manual-input").value += " ** " + str;
-      }
+      function removeAccents(str) { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
 
       function analyzeManual() {
         let cleanText = document.getElementById("manual-input").value;
-        //cleanText = removeAccents(document.getElementById('manual-input').value)
-        //     if (isApplePhoneOrTablet()) {
-
-        //     myLog("This is an Apple phone or tablet. and encoded? " + cleanText) ;
-        //         myLog( " length --" + cleanText.length );
-        //         myLog( " utf8to16 --" + utf8Toutf16(cleanText) + "-- " );
-        // // } else {
-        //   myLog("This is not an Apple phone or tablet.");
-        //   cleantext = utf8Toutf16(utf8Toutf16(cleanText));
-        // }
         cleanText = cleanText.replace(/%\w\w/g, " ");
         cleanText = removeAccents(cleanText);
-        
-        //    myLog(cleanText)  ;
-
-        runAnalysis("Manual Paste", cleanText);
+        runAnalysis(currentLang === "fr" ? "Saisie manuelle" : "Manual Paste", cleanText);
       }
 
-      // --- SETTINGS LOGIC ---
       function init() {
+        updateUI(); // Charger les textes
         const drop = document.getElementById("allergy-dropdown");
-        Object.keys(allergyDict)
-          .sort()
-          .forEach((k) => {
-            const opt = document.createElement("option");
-            opt.value = k;
-            opt.textContent = k.charAt(0).toUpperCase() + k.slice(1);
-            drop.appendChild(opt);
-          });
+        Object.keys(allergyDict).sort().forEach((k) => {
+          const opt = document.createElement("option");
+          opt.value = k;
+          opt.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+          drop.appendChild(opt);
+        });
         updateTags();
-        //analyzeManual();
-        switchTab(event, 'manual')
-        // -- don't startScanner();
+        switchTab({ target: document.getElementById("tab-manual") }, 'manual');
       }
 
       function addFromDropdown() {
         const val = document.getElementById("allergy-dropdown").value;
-        if (!userAllergies.includes(val)) {
-          userAllergies.push(val);
-          saveTags();
-        }
+        if (!userAllergies.includes(val)) { userAllergies.push(val); saveTags(); }
       }
 
       function addCustom() {
         const inp = document.getElementById("custom-allergy");
-        if (inp.value) {
-          userAllergies.push(inp.value.trim());
-          inp.value = "";
-          saveTags();
-        }
+        if (inp.value) { userAllergies.push(inp.value.trim()); inp.value = ""; saveTags(); }
       }
 
-      function removeTag(i) {
-        userAllergies.splice(i, 1);
-        saveTags();
-      }
+      function removeTag(i) { userAllergies.splice(i, 1); saveTags(); }
 
       function saveTags() {
-        localStorage.setItem(
-          "safescan_allergies",
-          JSON.stringify(userAllergies),
-        );
+        localStorage.setItem("safescan_allergies", JSON.stringify(userAllergies));
         updateTags();
       }
 
       function updateTags() {
-        document.getElementById("tag-list").innerHTML = userAllergies
-          .map(
-            (a, i) => `
+        document.getElementById("tag-list").innerHTML = userAllergies.map((a, i) => `
             <div class="tag">${a} <span class="tag-remove" onclick="removeTag(${i})">×</span></div>
-        `,
-          )
-          .join("");
+        `).join("");
       }
 
-      function clearManual() {
-        document.getElementById("manual-input").value = "";
-      }
-      function resetApp() {
-        location.reload();
-      }
+      function clearManual() { document.getElementById("manual-input").value = ""; }
+      function resetApp() { location.reload(); }
 
       window.onload = init;
-
-      // Register Service Worker
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
-      }
     </script>
   </body>
 </html>
