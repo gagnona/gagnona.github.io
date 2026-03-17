@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Démo : Tableau Dynamique avec Transition</title>
+    <style>
+        /* --- STYLE CSS --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2ecc71;
+        }
+
+        #table-container {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden; /* Pour les coins arrondis */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        caption {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            border-bottom: 1px solid #eee;
+        }
+
+        /* --- STYLES SPÉCIFIQUES --- */
+        
+        /* Titre des propriétés (Les labels) */
+        .property-title {
+            color: #2c3e50; /* Couleur des titres demandée */
+            font-weight: bold;
+            font-size: 0.85rem;
+            padding: 10px 5px 10px 15px;
+            white-space: nowrap; /* Empêche le retour à la ligne */
+        }
+
+        /* Valeurs des propriétés */
+        .property-value {
+            color: #555;
+            padding: 10px 15px 10px 5px;
+        }
+
+        /* --- ANIMATION DE TRANSITION --- */
+        
+        /* Classe de base pour chaque paire de lignes d'un objet */
+        .obj-block {
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Classe pour l'effet "fondu" lors de l'ajout */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Mon Application de Suivi</h1>
+    
+    <div class="controls">
+        <button onclick="simulerAjout()">Ajouter un Élément (Test)</button>
+    </div>
+
+    <div id="table-container"></div>
+
+    <script>
+        /* --- LOGIQUE JAVASCRIPT --- */
+        
+        // Initialisation de l'array de données (max 5 objets)
+        let dataQueue = [];
+
+        /**
+         * Reçoit un nouvel objet, l'ajoute au début (le plus récent est en haut),
+         * et retire le plus vieux si on dépasse 5.
+         */
+        function traiterNouvelObjet(nouvelObjet) {
+            // Ajouter au début
+            dataQueue.unshift(nouvelObjet);
+
+            // Si on a un 6ème élément, on le supprime (FIFO)
+            if (dataQueue.length > 5) {
+                dataQueue.pop();
+            }
+
+            renderTable();
+        }
+
+        /**
+         * Génère le rendu HTML complet du tableau à chaque modification
+         */
+        function renderTable() {
+            const container = document.getElementById('table-container');
+            
+            // On mémorise si le tableau existait déjà
+            const isFirstRender = !container.hasChildNodes();
+
+            // Vider le conteneur
+            container.innerHTML = ""; 
+
+            const table = document.createElement('table');
+
+            // Création du titre du tableau
+            const caption = table.createCaption();
+            caption.innerText = "Tableau des 5 éléments les plus récents";
+
+            // Parcourir l'array pour créer les lignes
+            dataQueue.forEach((obj, index) => {
+                
+                // --- Détermination de la couleur de fond ---
+                // Alternance tous les 2 lignes (pour 1 objet entier)
+                // index 0 -> #f9f9f9, index 1 -> #ffffff, index 2 -> #f9f9f9, etc.
+                const bgColor = (index % 2 === 0) ? "#f9f9f9" : "#ffffff";
+                
+                // Conversion de l'objet en un array de paires [Titre, Valeur]
+                const entries = Object.entries(obj); 
+
+                // --- Création de l'enveloppe d'animation ---
+                // Nous utilisons un `tbody` pour regrouper les 2 lignes de l'objet
+                // et lui appliquer la transition.
+                const tbody = document.createElement('tbody');
+                tbody.className = "obj-block";
+                
+                // Si c'est le tout nouvel objet (index 0) et ce n'est pas le 1er rendu, 
+                // on applique la classe d'animation pour le fondu.
+                if (index === 0 && !isFirstRender) {
+                    tbody.classList.add('fade-in');
+                    // Retirer la classe après la transition pour le prochain rendu
+                    setTimeout(() => tbody.classList.remove('fade-in'), 10);
+                }
+
+                // --- Création des deux lignes pour un seul objet ---
+                for (let rowIdx = 0; rowIdx < 2; rowIdx++) {
+                    const row = table.insertRow();
+                    row.style.backgroundColor = bgColor;
+
+                    // Chaque ligne affiche 4 paires (Titre: Valeur) = 8 colonnes totales
+                    // Ligne 1 (rowIdx=0) -> prend les entries de 0 à 3
+                    // Ligne 2 (rowIdx=1) -> prend les entries de 4 à 7
+                    const start = rowIdx * 4;
+                    for (let i = start; i < start + 4; i++) {
+                        
+                        // Cellule Titre (Label)
+                        const cellTitre = row.insertCell();
+                        cellTitre.className = "property-title";
+                        cellTitre.innerHTML = `<span>${entries[i][0]} :</span>`;
+                        
+                        // Cellule Valeur
+                        const cellValeur = row.insertCell();
+                        cellValeur.className = "property-value";
+                        cellValeur.innerText = entries[i][1];
+                    }
+                    // Ajouter la ligne créée au tbody de l'objet
+                    tbody.appendChild(row);
+                }
+
+                // Ajouter l'enveloppe de l'objet complet au tableau
+                table.appendChild(tbody);
+            });
+
+            // Afficher le tableau dans la page
+            container.appendChild(table);
+        }
+
+        // --- SECTION TEST PRATIQUE ---
+        
+        /**
+         * Génère un objet "fantaisie" pour le test
+         * L'objet contient exactement 8 propriétés (paires Titre/Valeur)
+         */
+        const genererMockItem = (id) => ({
+            "Identifiant": "ID-" + (1000 + id),
+            "Nom Item": "Produit Alpha-" + id,
+            "Prix Unitaire": (Math.random() * 50).toFixed(2) + "€",
+            "Qté Stock": Math.floor(Math.random() * 200),
+            "Zone": "A" + (id % 4),
+            "Status": (id % 2 === 0) ? "Actif" : "En attente",
+            "Date Maj": new Date().toLocaleTimeString('fr-FR'),
+            "Note Opé.": "RAS"
+        });
+
+        // Compteur pour le simulateur
+        let counter = 1;
+
+        /**
+         * Fonction liée au bouton pour ajouter un élément
+         */
+        function simulerAjout() {
+            const nouvelItem = genererMockItem(counter);
+            console.log("Nouvel objet reçu :", nouvelItem);
+            traiterNouvelObjet(nouvelItem);
+            counter++;
+        }
+
+        // --- Démarrage Automatique (Optionnel) ---
+        // Ajout de 2 éléments au chargement pour le visuel
+        simulerAjout();
+        simulerAjout();
+
+    </script>
+</body>
+</html>
