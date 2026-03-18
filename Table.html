@@ -220,7 +220,7 @@
             "Nom Item": "Produit Alpha-" + id,
             "Prix Unitaire": (Math.random() * 50).toFixed(2) + "€",
             "Qté Stock": Math.floor(Math.random() * 200),
-            "Zone": "A" + (id % 4),
+            "Zone": "A" + id,
             "Status": (id % 2 === 0) ? "Actif" : "En attente",
             "Date Maj": new Date().toLocaleTimeString('fr-FR'),
             "Note Opé.": "RAS"
